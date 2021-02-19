@@ -1,39 +1,35 @@
 const express = require('express');
 const cors = require('cors');
 const app = express();
-
+app.use(cors({ origin: true }));
 // Firebase
-const functions = require('firebase-functions');
-const { admin, db } = require('./admin');
-const config = require('./config');
 const firebase = require('firebase/app');
+require('firebase/auth');
+const functions = require('firebase-functions');
+const { admin, db } = require('./util/admin');
+const config = require('./util/config');
 firebase.initializeApp(config);
 
-// Automatically allow cross-origin requests
-app.use(cors({ origin: true }));
-
-app.get('/helloworld', (request, response) => {
+app.get('/helloworld', (req, res) => {
   functions.logger.info('Hello logs!', { structuredData: true });
-  response.send('Hello World!');
+  res.send(firebase.apps.map((e) => e.name));
 });
 
 app.post('/login', (req, res) => {
-  const userData = {
-    email: req.body.email,
-    password: req.body.email,
-  };
   firebase
     .auth()
-    .signInWithEmailAndPassword(userData.email, userData.password)
-    .then((userCredential) => {
-      // Signed in
-      var user = userCredential.user;
-      return res.status(200).json('Login succesful');
+    .signInWithEmailAndPassword(req.body.email, req.body.password)
+    .then((data) => {
+      return data.user.getIdToken();
+    })
+    .then((token) => {
+      return res.json({ token });
     })
     .catch((error) => {
-      var errorCode = error.code;
-      var errorMessage = error.message;
-      return res.status(404).json(errorCode, errorMessage);
+      console.log(error);
+      return res
+        .status(403)
+        .json((general = 'Wrong credentials, please try again'));
     });
 });
 
