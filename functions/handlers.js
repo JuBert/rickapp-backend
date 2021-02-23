@@ -46,7 +46,7 @@ exports.addMessage = async (req, res) => {
 
 exports.getBeers = (req, res) => {
   axios
-    .get('https://api.punkapi.com/v2/beers?per_page=3')
+    .get('https://api.punkapi.com/v2/beers?per_page=6')
     .then((response) => {
       let beers = [];
       response.data.map((beer) => {
