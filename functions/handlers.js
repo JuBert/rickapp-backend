@@ -56,3 +56,13 @@ exports.getBeers = (req, res) => {
     })
     .catch((err) => res.status(500).json({ error: err.code }));
 };
+
+exports.getOneBeer = (req, res) => {
+  axios
+    .get(`https://api.punkapi.com/v2/beers/${req.query.beer}`)
+    .then((response) => {
+      let beer = response.data;
+      res.status(200).json(beer);
+    })
+    .catch((error) => res.status(500).json({ error: err.code }));
+};
